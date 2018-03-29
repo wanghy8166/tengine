@@ -2,7 +2,7 @@ FROM ubuntu:14.04
 
 MAINTAINER Erik Osterman <e@osterman.com>
 
-ENV NGINX_VERSION tengine-2.1.0
+ENV NGINX_VERSION 2.2.2
 
 ENV   DEBIAN_FRONTEND noninteractive
 ENV   LANGUAGE en_US.UTF-8
@@ -15,7 +15,7 @@ RUN locale-gen $LANGUAGE && \
 
 WORKDIR /usr/src/
 
-ADD https://github.com/alibaba/tengine/archive/${NGINX_VERSION}.tar.gz tengine.tar.gz
+ADD http://tengine.taobao.org/download/tengine-${NGINX_VERSION}.tar.gz tengine.tar.gz
 
 # https://github.com/alibaba/tengine/blob/master/auto/options
 # https://travis-ci.org/alibaba/tengine/jobs/32304924
@@ -75,7 +75,6 @@ RUN apt-get update && \
         --with-http_addition_module \
         --with-http_dav_module \
         --with-http_realip_module \
-        --with-http_spdy_module \
         --with-http_ssl_module \
         --with-http_stub_status_module \
         --with-http_sub_module \
@@ -121,7 +120,8 @@ RUN apt-get update && \
     chown -R www-data:www-data /var/lib/nginx/body && \
     apt-get -y remove build-essential && \
     dpkg --get-selections | awk '{print $1}'|cut -d: -f1|grep -- '-dev$' | xargs apt-get remove -y && \
-    rm -rf /usr/src && \
+    mkdir -p /usr/src && \
+    rm /usr/src/* -rf && \
     apt-get clean all && \
     rm -rf /tmp/* && \
     ln -sf /dev/stdout /var/log/nginx/access.log && \
